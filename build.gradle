@@ -1,0 +1,31 @@
+plugins {
+    id "idea"
+    id "java"
+}
+
+ext {
+    slf4jVersion = "2.0.16"
+    logbackVersion = "1.5.9"
+    lombokVersion = "1.18.34"
+    jetbrainsAnnotationsVersion = "26.0.0"
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.slf4j:slf4j-api:$slf4jVersion"
+    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    implementation "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
+}
