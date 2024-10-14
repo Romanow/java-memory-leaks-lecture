@@ -36,7 +36,8 @@ project.configurations.implementation.setCanBeResolved(true)
 tasks.register("runEqualsAndHashCodeExample", JavaExec) {
     mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
     classpath = sourceSets.main.runtimeClasspath
-    jvmArgs = ["-Xms16m", "-Xmx16m",
+    standardInput = System.in
+    jvmArgs = ["-Xms32m", "-Xmx32m",
                "-Dcom.sun.management.jmxremote",
                "-Dcom.sun.management.jmxremote.port=9091",
                "-Dcom.sun.management.jmxremote.authenticate=false",
