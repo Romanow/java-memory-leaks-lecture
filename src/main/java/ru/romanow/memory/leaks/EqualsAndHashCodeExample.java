@@ -4,24 +4,33 @@
 
 package ru.romanow.memory.leaks;
 
+import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class EqualsAndHashCodeExample {
     private static final Logger logger = LoggerFactory.getLogger("EqualsAndHashCodeExample");
 
     public static void main(String[] args) {
+        var input = "";
+        var scanner = new Scanner(System.in);
         final var map = new HashMap<KeyHolder, Integer>();
-        for (int i = 0; i < 100; i++) {
-            map.put(new KeyHolder("key"), i);
-        }
+        while (!input.equals("exit")) {
+            for (int i = 0; i < 100_000; i++) {
+                map.put(new KeyHolder("key"), i);
+            }
 
-        logger.info("Map size: {}", map.size());
-        map.remove(new KeyHolder("key"));
-        logger.info("Map size after remove: {}", map.size());
+            logger.info("Map size: {}", map.size());
+            map.remove(new KeyHolder("key"));
+            logger.info("Map size after remove: {}", map.size());
+
+            System.out.println("Continue? (type 'exit' for exit)");
+            input = scanner.nextLine();
+        }
     }
 
     @SuppressWarnings("ClassCanBeRecord")

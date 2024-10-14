@@ -1,6 +1,7 @@
 plugins {
     id "idea"
     id "java"
+    id "application"
 }
 
 ext {
@@ -28,4 +29,28 @@ dependencies {
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
     implementation "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
+}
+
+project.configurations.implementation.setCanBeResolved(true)
+
+tasks.register("runEqualsAndHashCodeExample", JavaExec) {
+    mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
+    classpath = sourceSets.main.runtimeClasspath
+    jvmArgs = ["-Xms16m", "-Xmx16m",
+               "-Dcom.sun.management.jmxremote",
+               "-Dcom.sun.management.jmxremote.port=9091",
+               "-Dcom.sun.management.jmxremote.authenticate=false",
+               "-Dcom.sun.management.jmxremote.ssl=false "]
+}
+
+jar {
+    archiveFileName = "${project.name}.jar"
+    manifest {
+        attributes(
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Class-Path": configurations.implementation.collect { it.absolutePath }.join(" "),
+                "Main-Class": "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
+        )
+    }
 }
