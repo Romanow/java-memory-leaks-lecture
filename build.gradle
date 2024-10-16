@@ -5,10 +5,7 @@ plugins {
 }
 
 ext {
-    slf4jVersion = "2.0.16"
-    logbackVersion = "1.5.9"
     lombokVersion = "1.18.34"
-    jetbrainsAnnotationsVersion = "26.0.0"
 }
 
 idea {
@@ -23,35 +20,35 @@ repositories {
 }
 
 dependencies {
-    implementation "org.slf4j:slf4j-api:$slf4jVersion"
-    implementation "ch.qos.logback:logback-classic:$logbackVersion"
-
     compileOnly "org.projectlombok:lombok:$lombokVersion"
     annotationProcessor "org.projectlombok:lombok:$lombokVersion"
-    implementation "org.jetbrains:annotations:$jetbrainsAnnotationsVersion"
 }
 
 project.configurations.implementation.setCanBeResolved(true)
 
-tasks.register("runEqualsAndHashCodeExample", JavaExec) {
+abstract class ApplicationRunner extends JavaExec {
+    ApplicationRunner() {
+        description = "Application runner"
+        group = "application"
+
+        classpath = project.sourceSets.main.runtimeClasspath
+        standardInput = System.in
+        jvmArgs = ["-Xms32m", "-Xmx32m",
+                   "-Dcom.sun.management.jmxremote",
+                   "-Dcom.sun.management.jmxremote.port=9091",
+                   "-Dcom.sun.management.jmxremote.authenticate=false",
+                   "-Dcom.sun.management.jmxremote.ssl=false "]
+    }
+}
+
+tasks.register("runEqualsAndHashCodeExample", ApplicationRunner) {
     mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
-    classpath = sourceSets.main.runtimeClasspath
-    standardInput = System.in
-    jvmArgs = ["-Xms32m", "-Xmx32m",
-               "-Dcom.sun.management.jmxremote",
-               "-Dcom.sun.management.jmxremote.port=9091",
-               "-Dcom.sun.management.jmxremote.authenticate=false",
-               "-Dcom.sun.management.jmxremote.ssl=false "]
+}
+
+tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.UnclosedResourcesExample"
 }
 
 jar {
-    archiveFileName = "${project.name}.jar"
-    manifest {
-        attributes(
-                "Implementation-Title": project.name,
-                "Implementation-Version": version,
-                "Class-Path": configurations.implementation.collect { it.absolutePath }.join(" "),
-                "Main-Class": "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
-        )
-    }
+    enabled = false
 }

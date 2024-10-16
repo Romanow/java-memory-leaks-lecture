@@ -1,20 +1,12 @@
 /*
  * Copyright (c) Romanov Alexey, 2024
  */
-
 package ru.romanow.memory.leaks;
-
-import lombok.val;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class EqualsAndHashCodeExample {
-    private static final Logger logger = LoggerFactory.getLogger("EqualsAndHashCodeExample");
-
     public static void main(String[] args) {
         var input = "";
         var scanner = new Scanner(System.in);
@@ -24,11 +16,11 @@ public class EqualsAndHashCodeExample {
                 map.put(new KeyHolder("key"), i);
             }
 
-            logger.info("Map size: {}", map.size());
+            System.out.printf("Map size: %d\n", map.size());
             map.remove(new KeyHolder("key"));
-            logger.info("Map size after remove: {}", map.size());
+            System.out.printf("Map size after remove: %d\n", map.size());
 
-            System.out.println("Continue? (type 'exit' for exit)");
+            System.out.print("Continue? (type 'exit' for exit): ");
             input = scanner.nextLine();
         }
     }
@@ -37,16 +29,15 @@ public class EqualsAndHashCodeExample {
     private static class KeyHolder {
         private final String key;
 
-        public KeyHolder(@NotNull String key) {
+        public KeyHolder(String key) {
             this.key = key;
         }
 
-        @NotNull
         public String key() {
             return key;
         }
     }
 
-//    private record KeyHolder(@NotNull String key) {
+//    private record KeyHolder(String key) {
 //    }
 }
