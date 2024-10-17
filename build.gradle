@@ -41,8 +41,8 @@ abstract class ApplicationRunner extends JavaExec {
     }
 }
 
-tasks.register("runEqualsAndHashCodeExample", ApplicationRunner) {
-    mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
+tasks.register("runStaticResourcesExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.StaticResourcesExample"
 }
 
 tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
@@ -50,5 +50,5 @@ tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
 }
 
 jar {
-    enabled = false
+//    enabled = false
 }
