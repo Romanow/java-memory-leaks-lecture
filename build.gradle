@@ -50,5 +50,5 @@ tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
 }
 
 jar {
-//    enabled = false
+    enabled = false
 }
