@@ -92,6 +92,9 @@
 
 #### ThreadLocal переменные при использовании пула потоков
 
+> By definition, a reference to a ThreadLocal value is kept until the "owning" thread dies or if the ThreadLocal itself
+> is no longer reachable.
+
 ### Как найти утечку памяти?
 
 Какого-то универсального алгоритма поиска утечки памяти нет, но вот список основных действий, которые нужно выполнить:

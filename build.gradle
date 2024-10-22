@@ -34,6 +34,7 @@ abstract class ApplicationRunner extends JavaExec {
         classpath = project.sourceSets.main.runtimeClasspath
         standardInput = System.in
         jvmArgs = ["-Xms32m", "-Xmx32m",
+                   "-verbose:gc",
                    "-Dcom.sun.management.jmxremote",
                    "-Dcom.sun.management.jmxremote.port=9091",
                    "-Dcom.sun.management.jmxremote.authenticate=false",
@@ -47,6 +48,10 @@ tasks.register("runStaticResourcesExample", ApplicationRunner) {
 
 tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
     mainClass = "ru.romanow.memory.leaks.UnclosedResourcesExample"
+}
+
+tasks.register("runThreadLocalMapExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.ThreadLocalMapExample"
 }
 
 jar {
