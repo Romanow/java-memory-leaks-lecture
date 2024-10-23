@@ -11,13 +11,13 @@
 
 ## План
 
-1. Какие есть виды OutOfMemory.
+1. Как устроена память в Java.
 2. Как в Java осуществляется поиск неиспользуемых объектов?
 3. Рассмотрим несколько примеров, когда возникает утечка памяти:
     * неверная реализация `equals` и `hashCode`;
-    * незакрытые ресурсы;
-    * устраните устаревшие ссылки на объекты;
-    * ThreadLocal переменные при использовании пула потоков.
+    * cтатические переменные;
+    * ThreadLocal переменные при использовании пула потоков;
+    * Пул строк (String interning).
 4. Как найти утечку памяти?
 5. Выводы: список простых правил как бороться с утечками памяти.
 
@@ -32,10 +32,11 @@
 * **Heap** – основной сегмент памяти, используется для выделения памяти под объекты и JRE классы. Создание нового
   объекта происходит в Heap, здесь работает GC.
 * **Metaspace** – хранятся метаданные о классе и статические поля: там хранятся это либо примитивы, либо ссылки на
-  объекты/массивы, которые сами по себе аллоцированы в heap. **Metaspace** в Java 8 пришел на замену PermGen, основное
-  отличие которой — возможность динамически расширятся, ограниченная по умолчанию только размером нативной памяти.
-  Опционально можно задать размер через аргумент`-XX:MaxMetaspaceSize`. В боевых окружениях желательно всегда задавать
-  размер Metaspace. В случае возникновения ошибки, лечится увеличением **Metaspace**, либо добавлением памяти.
+  объекты/массивы, которые сами по себе аллоцированы в **Heap**. **Metaspace** в Java 8 пришел на замену **PermGen**,
+  основное отличие которой — возможность динамически расширятся, ограниченная по умолчанию только размером нативной
+  памяти. Опционально можно задать размер через аргумент`-XX:MaxMetaspaceSize`. В боевых окружениях желательно всегда
+  задавать размер **Metaspace**. В случае возникновения ошибки, лечится увеличением **Metaspace**, либо добавлением
+  памяти.
 * **Stack** – стековая память в Java работает по схеме LIFO: всякий раз, когда вызывается метод, в памяти стека
   создается новый блок, который содержит примитивы и _ссылки_ на другие объекты в методе. Каждый поток имеет свой стек,
   примитивы и ссылки на локальные переменные хранятся в стеке. Как только метод заканчивает работу, блок также перестает
@@ -78,22 +79,39 @@
 
 ### Примеры
 
-* OutOfMemoryError: Java heap space.
-* OutOfMemoryError: Metaspace. <-- рассмотрим этот класс ошибок.
+* OutOfMemoryError: Java heap space. <-- рассмотрим этот класс ошибок.
+* OutOfMemoryError: Metaspace.
 * OutOfMemoryError: Requested array size exceeds VM limit.
 * OutOfMemoryError: Unable to create new native thread.
 * OutOfMemoryError: GC Overhead limit exceeded.
 
 #### Неверная реализация `equals` и `hashCode`
 
+Пример: [EqualsAndHashCodeExample](src/main/java/ru/romanow/memory/leaks/EqualsAndHashCodeExample.java).
+Запуск: `./gradlew runEqualsAndHashCodeExample`.
+
 #### Статические переменные
 
-#### Незакрытые ресурсы
+Пример: [StaticResourcesExample](src/main/java/ru/romanow/memory/leaks/StaticResourcesExample.java).
+Запуск: `./gradlew runStaticResourcesExample`.
 
 #### ThreadLocal переменные при использовании пула потоков
 
+Пример: [ThreadLocalExample](src/main/java/ru/romanow/memory/leaks/ThreadLocalExample.java).
+Запуск: `./gradlew runThreadLocalExample`.
+
 > By definition, a reference to a ThreadLocal value is kept until the "owning" thread dies or if the ThreadLocal itself
 > is no longer reachable.
+
+#### Пул строк (String interning)
+
+Пример: [InternalStringsExample](src/main/java/ru/romanow/memory/leaks/InternalStringsExample.java).
+Запуск: `./gradlew runInternalStringsExample`.
+
+> Prior to Java 7 interned strings were allocated in PermGen space. This would become a garbage collector issue once
+> your string is of no more use in application, since the interned string pool is a static member of the String class
+> and will never be garbage collected. From Java 7 onward the interned strings are allocated on the Heap and are subject
+> to garbage collection.
 
 ### Как найти утечку памяти?
 
@@ -109,3 +127,5 @@
    работать с памятью из Java (она для этого не приспособлена).
 
 ### Выводы: список простых правил как бороться с утечками памяти
+
+Keep it simple.

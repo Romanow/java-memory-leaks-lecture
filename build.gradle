@@ -46,12 +46,20 @@ tasks.register("runStaticResourcesExample", ApplicationRunner) {
     mainClass = "ru.romanow.memory.leaks.StaticResourcesExample"
 }
 
-tasks.register("runUnclosedResourcesExample", ApplicationRunner) {
-    mainClass = "ru.romanow.memory.leaks.UnclosedResourcesExample"
+tasks.register("runEqualsAndHashCodeExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
 }
 
-tasks.register("runThreadLocalMapExample", ApplicationRunner) {
-    mainClass = "ru.romanow.memory.leaks.ThreadLocalMapExample"
+tasks.register("runThreadLocalExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.ThreadLocalExample"
+}
+
+tasks.register("runCustomClassLoaderExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.CustomClassLoaderExample"
+}
+
+tasks.register("runInternalStringsExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.InternalStringsExample"
 }
 
 jar {

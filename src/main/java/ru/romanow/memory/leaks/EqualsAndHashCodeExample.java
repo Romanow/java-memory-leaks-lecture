@@ -15,7 +15,7 @@ public class EqualsAndHashCodeExample {
         final var scanner = new Scanner(System.in);
         final var map = new HashMap<KeyHolder, Integer>();
         while (true) {
-            for (int i = 0; i < 100_000; i++) {
+            for (int i = 0; i < 25_000; i++) {
                 map.put(new KeyHolder("key"), i);
             }
 
@@ -30,6 +30,7 @@ public class EqualsAndHashCodeExample {
         }
     }
 
+    @SuppressWarnings("ClassCanBeRecord")
     private static class KeyHolder {
         private final String key;
 
@@ -42,6 +43,5 @@ public class EqualsAndHashCodeExample {
         }
     }
 
-//    private record KeyHolder(String key) {
-//    }
+    // private record KeyHolder(String key) {}
 }
