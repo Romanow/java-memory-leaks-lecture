@@ -7,19 +7,23 @@
 
 Все знают, что в Java есть сборщик мусора, и она сама очищает неиспользуемую память. Но этот механизм может работать не
 всегда идеально: можно написать код таким образом, что Java не сможет очистить память и она будет копиться пока
-приложение не упадет по OutOfMemory. На простых примерах рассмотрим несколько случаев, когда это может произойти.
+приложение не упадет по OutOfMemoryError. На простых примерах рассмотрим несколько случаев, когда это может произойти. А
+в заключении поговорим как искать утечки памяти с использованием встроенных инструментов JDK.
 
 ## План
 
 1. Как устроена память в Java.
 2. Как в Java осуществляется поиск неиспользуемых объектов?
 3. Рассмотрим несколько примеров, когда возникает утечка памяти:
-    * неверная реализация `equals` и `hashCode`;
-    * cтатические переменные;
-    * ThreadLocal переменные при использовании пула потоков;
+    * Неверная реализация `equals` и `hashCode`.
+    * Статические члены класса.
+    * Пытаемся исправить утечку памяти с помощью WeakReference.
+    * ThreadLocal переменные при использовании пула потоков.
+    * Нестатические внутренние классы.
     * Пул строк (String interning).
-4. Как найти утечку памяти?
-5. Выводы: простые правила как не допускать утечек памяти.
+4. Как найти утечку памяти (работаем с `jmap`, `jstack` и `jhsdb`);
+5. Отладка приложения через консоль.
+6. Выводы: простые правила как не допускать утечек памяти.
 
 ## Доклад
 
@@ -95,6 +99,13 @@
 Пример: [StaticResourcesExample](src/main/java/ru/romanow/memory/leaks/StaticResourcesExample.java).
 Запуск: `./gradlew runStaticResourcesExample`.
 
+#### Используем WeakReference
+
+Пример: [StaticResourcesWeakReferenceExample](src/main/java/ru/romanow/memory/leaks/StaticResourcesWeakReferenceExample.java).
+Запуск: `./gradlew runStaticResourcesWeakReferenceExample`.
+
+Значение очищается, но ключ остается. Нужно использовать `java.util.WeakHashMap`.
+
 #### ThreadLocal переменные при использовании пула потоков
 
 Пример: [ThreadLocalExample](src/main/java/ru/romanow/memory/leaks/ThreadLocalExample.java).
@@ -113,6 +124,11 @@
 > and will never be garbage collected. From Java 7 onward the interned strings are allocated on the Heap and are subject
 > to garbage collection.
 
+#### TODO
+
+* Внутренние классы.
+* Как исправить статические члены класса с WeakReference. Использование WeakReference вместо WeakHashMap.
+
 ### Как найти утечку памяти?
 
 Какого-то универсального алгоритма поиска утечки памяти нет, но вот список основных действий, которые нужно выполнить:
@@ -125,6 +141,31 @@
 4. Если вы используете JNI (Java Native Interface) или другие средства нативного взаимодействия с памятью, то
    постарайтесь уйти от этого. Возможно, лучше написать сервер на C++ и коммуницировать с ним через socket, чем напрямую
    работать с памятью из Java (она для этого не приспособлена).
+
+```shell
+$ jps -l
+$ jstack <PID> > threaddump.txt
+$ jhsdb jmap --heap --pid 62807    
+$ jmap -histo <PID> | head
+$ jmap -dump:format=b,file=heapdump.hprof <PID>
+```
+
+### Удаленная отладка
+
+Для подключения debugger'а нужно запустить с флагом:
+`-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:8008`.
+
+```shell
+$ jdb -attach 8000
+$ stop at ru.romanow.memory.leaks.StaticResourcesExample:19
+$ print ru.romanow.memory.leaks.StaticResourcesExample.cache.size()
+$ locals
+$ step into
+$ step up
+$ resume
+$ clear ru.romanow.memory.leaks.StaticResourcesExample:19
+
+```
 
 ### Выводы: список простых правил как бороться с утечками памяти
 

@@ -35,6 +35,7 @@ abstract class ApplicationRunner extends JavaExec {
         standardInput = System.in
         jvmArgs = ["-Xms32m", "-Xmx32m",
                    "-verbose:gc",
+                   "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:8008",
                    "-Dcom.sun.management.jmxremote",
                    "-Dcom.sun.management.jmxremote.port=9091",
                    "-Dcom.sun.management.jmxremote.authenticate=false",
@@ -46,8 +47,16 @@ tasks.register("runStaticResourcesExample", ApplicationRunner) {
     mainClass = "ru.romanow.memory.leaks.StaticResourcesExample"
 }
 
+tasks.register("runStaticResourcesWeakReferenceExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.StaticResourcesWeakReferenceExample"
+}
+
 tasks.register("runEqualsAndHashCodeExample", ApplicationRunner) {
     mainClass = "ru.romanow.memory.leaks.EqualsAndHashCodeExample"
+}
+
+tasks.register("runNonStaticInnerClassExample", ApplicationRunner) {
+    mainClass = "ru.romanow.memory.leaks.NonStaticInnerClassExample"
 }
 
 tasks.register("runThreadLocalExample", ApplicationRunner) {
